@@ -68,6 +68,9 @@ const Registration: React.FC = () => {
       role: formData.role,
     };
 
+    if (formData.password !== formData.confirmPassword)
+      return alert("Password are not matching!");
+
     await registrationAction(registrationData);
   };
   return (
