@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { registrationAction } from "./registrationAction.action";
 
 interface RegistrationFromData {
   name: string;
@@ -37,7 +38,7 @@ interface RegistrationFromData {
 const Registration: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [fromData, setFromData] = useState<RegistrationFromData>({
+  const [formData, setFormData] = useState<RegistrationFromData>({
     name: "",
     userName: "",
     email: "",
@@ -46,20 +47,28 @@ const Registration: React.FC = () => {
     role: "applicant",
   });
   const handleInputChange = (name: string, value: string) => {
-    setFromData((prev) => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
   /* Debugging Line */
-  console.log(fromData);
+  console.log(formData);
 
-  const handleSubmit = (e: FormEvent) => {
-    try {
-    } catch (error) {
-      console.log(error);
-    }
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    // Here we would typically make api call
+
+    const registrationData = {
+      name: formData.name.trim(),
+      userName: formData.userName.trim(),
+      email: formData.email.toLowerCase().trim(),
+      password: formData.password,
+      role: formData.role,
+    };
+
+    await registrationAction(registrationData);
   };
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -81,10 +90,11 @@ const Registration: React.FC = () => {
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="name"
+                  name="name"
                   type="text"
                   placeholder="Enter your full name"
                   required
-                  value={fromData.name}
+                  value={formData.name}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     handleInputChange("name", e.target.value)
                   }
@@ -100,10 +110,11 @@ const Registration: React.FC = () => {
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="userName"
+                  name="userName"
                   type="text"
                   placeholder="Choose a username"
                   required
-                  value={fromData.userName}
+                  value={formData.userName}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     handleInputChange("userName", e.target.value)
                   }
@@ -120,9 +131,10 @@ const Registration: React.FC = () => {
                 <Input
                   id="email"
                   type="email"
+                  name="email"
                   placeholder="Enter your email"
                   required
-                  value={fromData.email}
+                  value={formData.email}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     handleInputChange("email", e.target.value)
                   }
@@ -135,7 +147,8 @@ const Registration: React.FC = () => {
             <div className="space-y-2 w-full">
               <Label htmlFor="role">I am a *</Label>
               <Select
-                value={fromData.role}
+                name="role"
+                value={formData.role}
                 onValueChange={(value: "applicant" | "employer" | null) =>
                   handleInputChange("role", value!)
                 }
@@ -157,10 +170,11 @@ const Registration: React.FC = () => {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a strong password"
                   required
-                  value={fromData.password}
+                  value={formData.password}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     handleInputChange("password", e.target.value)
                   }
@@ -190,10 +204,11 @@ const Registration: React.FC = () => {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="confirmPassword"
+                  name="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
                   required
-                  value={fromData.confirmPassword}
+                  value={formData.confirmPassword}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     handleInputChange("confirmPassword", e.target.value)
                   }
