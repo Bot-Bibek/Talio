@@ -1,10 +1,7 @@
 "use client";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { Input } from "@/components/ui/input";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
@@ -16,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import { Controller, useForm } from "react-hook-form";
+
 import { Eye, EyeOff, Lock, Mail, User, UserCheck } from "lucide-react";
 import {
   Select,
@@ -26,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { registrationAction } from "./registrationAction.action";
+import { toast } from "sonner";
 
 interface RegistrationFromData {
   name: string;
@@ -69,9 +67,11 @@ const Registration: React.FC = () => {
     };
 
     if (formData.password !== formData.confirmPassword)
-      return alert("Password are not matching!");
+      return toast.error("Password are not matching!");
 
-    await registrationAction(registrationData);
+    const result = await registrationAction(registrationData);
+    if (result.status === "SUCCESS") toast.success(result.message);
+    else toast.error(result.message);
   };
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
