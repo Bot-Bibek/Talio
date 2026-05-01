@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { registrationAction } from "./registrationAction.action";
+import { registrationAction } from "../../features/auth/server/auth.action";
 import { toast } from "sonner";
 
 interface RegistrationFromData {
