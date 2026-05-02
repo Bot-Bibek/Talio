@@ -1,23 +1,17 @@
-
-
 "use server";
 
 import { db } from "@/config/db";
 import { users } from "@/drizzle/schema";
 import argon2 from "argon2";
 import { eq, or } from "drizzle-orm";
+import { RegisterUserData, registerUserSchema } from "../auth.schema";
 
-interface RegisterationData{
-  name: string;
-  userName: string;
-  email: string;
-  password: string;
-  role: "applicant" | "employer";
-}
-
-export const registrationAction = async (data: RegisterationData) => {
+export const registrationAction = async (data: RegisterUserData) => {
   try {
-    const { name, userName, email, role, password } = data;
+    const { data: validatedData, error } = registerUserSchema.safeParse(data);
+    if (error) return { status: "ERROR", message: error.issues[0].message };
+
+    const { name, userName, email, role, password } = validatedData;
 
     const [user] = await db
       .select()
@@ -47,39 +41,38 @@ export const registrationAction = async (data: RegisterationData) => {
       message: "Unknown Error Occured! Please Try Again Later",
     };
   }
-}; 
+};
 
 interface LoginData {
   email: string;
   password: string;
 }
 
-export const loginUserAction = async (data:LoginData) =>{
+export const loginUserAction = async (data: LoginData) => {
   try {
-    const {email, password} = data;
+    const { email, password } = data;
 
-    const [user] = await db.select().from(users).where(eq(users.email, email))
+    const [user] = await db.select().from(users).where(eq(users.email, email));
 
-    if(!user){
+    if (!user) {
       return {
         status: "ERROR",
-        message: "Invalid Email or Password"
-      } 
+        message: "Invalid Email or Password",
+      };
     }
 
-    const isValidPassword = await argon2.verify(user.password, password)
-    if(!isValidPassword){
-       return {
-         status: "ERROR",
-         message: "Invalid Email or Password",
-       }; 
+    const isValidPassword = await argon2.verify(user.password, password);
+    if (!isValidPassword) {
+      return {
+        status: "ERROR",
+        message: "Invalid Email or Password",
+      };
     }
 
-    return{
+    return {
       status: "SUCCESS",
-      message: "Login Successful.."
-    }
-
+      message: "Login Successful..",
+    };
   } catch (error) {
     console.log(error);
     return {
@@ -87,5 +80,4 @@ export const loginUserAction = async (data:LoginData) =>{
       message: "Unknown Error Occured! Please Try Again Later",
     };
   }
-
-}
+};
