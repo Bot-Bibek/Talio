@@ -1,10 +1,8 @@
 "use client";
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
-
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-
 import {
   Card,
   CardContent,
@@ -24,52 +22,27 @@ import {
 } from "@/components/ui/select";
 import { registrationAction } from "../../features/auth/server/auth.action";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import {
+  RegisterUserWithConfirmData,
+  registerUserWithConfirmSchema,
+} from "@/features/auth/auth.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-interface RegistrationFromData {
-  name: string;
-  userName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  role: "applicant" | "employer";
-}
 const Registration: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [formData, setFormData] = useState<RegistrationFromData>({
-    name: "",
-    userName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    role: "applicant",
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registerUserWithConfirmSchema),
   });
-  const handleInputChange = (name: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
 
-  /* Debugging Line */
-  console.log(formData);
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    // Here we would typically make api call
-
-    const registrationData = {
-      name: formData.name.trim(),
-      userName: formData.userName.trim(),
-      email: formData.email.toLowerCase().trim(),
-      password: formData.password,
-      role: formData.role,
-    };
-
-    if (formData.password !== formData.confirmPassword)
-      return toast.error("Password are not matching!");
-
-    const result = await registrationAction(registrationData);
+  const onSubmit = async (data: RegisterUserWithConfirmData) => {
+    const result = await registrationAction(data);
     if (result.status === "SUCCESS") toast.success(result.message);
     else toast.error(result.message);
   };
@@ -85,7 +58,7 @@ const Registration: React.FC = () => {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Name Field */}
             <div className="space-y-2">
               <Label htmlFor="name">Full Name *</Label>
@@ -93,14 +66,10 @@ const Registration: React.FC = () => {
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="name"
-                  name="name"
                   type="text"
                   placeholder="Enter your full name"
                   required
-                  value={formData.name}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("name", e.target.value)
-                  }
+                  {...register("name")}
                   className={`pl-10 `}
                 />
               </div>
@@ -113,17 +82,20 @@ const Registration: React.FC = () => {
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="userName"
-                  name="userName"
                   type="text"
                   placeholder="Choose a username"
                   required
-                  value={formData.userName}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("userName", e.target.value)
-                  }
-                  className="pl-10"
+                  {...register("userName")}
+                  className={`pl-10 ${
+                    errors.userName ? "border-destructive" : ""
+                  }`}
                 />
               </div>
+              {errors.userName && (
+                <p className="text-sm text-destructive">
+                  {errors.userName.message}
+                </p>
+              )}
             </div>
 
             {/* Email Field */}
@@ -134,28 +106,25 @@ const Registration: React.FC = () => {
                 <Input
                   id="email"
                   type="email"
-                  name="email"
                   placeholder="Enter your email"
                   required
-                  value={formData.email}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("email", e.target.value)
-                  }
-                  className={`pl-10 `}
+                  {...register("email")}
+                  className={`pl-10 ${
+                    errors.email ? "border-destructive" : ""
+                  }`}
                 />
               </div>
+              {errors.email && (
+                <p className="text-sm text-destructive">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
             {/* Role Selection */}
             <div className="space-y-2 w-full">
               <Label htmlFor="role">I am a *</Label>
-              <Select
-                name="role"
-                value={formData.role}
-                onValueChange={(value: "applicant" | "employer" | null) =>
-                  handleInputChange("role", value!)
-                }
-              >
+              <Select {...register("role")}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select your role" />
                 </SelectTrigger>
@@ -173,14 +142,10 @@ const Registration: React.FC = () => {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="password"
-                  name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a strong password"
                   required
-                  value={formData.password}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("password", e.target.value)
-                  }
+                  {...register("password")}
                   className={`pl-10 pr-10 `}
                 />
 
@@ -207,14 +172,10 @@ const Registration: React.FC = () => {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="confirmPassword"
-                  name="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
                   required
-                  value={formData.confirmPassword}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("confirmPassword", e.target.value)
-                  }
+                  {...register("confirmPassword")}
                   className={`pl-10 pr-10 `}
                 />
                 <Button
