@@ -66,6 +66,11 @@ const LoginFrom: React.FC = () => {
                   className={`pl-10 `}
                 />
               </div>
+              {errors.email && (
+                <p className="text-sm text-destructive">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
             {/* Password Field */}
@@ -77,10 +82,11 @@ const LoginFrom: React.FC = () => {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a strong password"
-                  {...register("email")}
+                  {...register("password")}
                   required
-                  className={`pl-10
-                `}
+                  className={`pl-10 ${
+                    errors.password ? "border-destructive" : ""
+                  }`}
                 />
 
                 <Button
@@ -97,11 +103,16 @@ const LoginFrom: React.FC = () => {
                   )}
                 </Button>
               </div>
+              {errors.password && (
+                <p className="text-sm text-destructive">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             {/* Submit Button */}
             <Button type="submit" className="w-full">
-              Create Account
+              Login
             </Button>
 
             <div className="text-center">
