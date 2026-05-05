@@ -10,6 +10,7 @@ import {
   LoginUserData,
   loginUserSchema,
 } from "../auth.schema";
+import { createSessionAndSetCookies } from "./use-cases/session";
 
 export const registrationAction = async (data: RegisterUserData) => {
   try {
@@ -71,6 +72,8 @@ export const loginUserAction = async (data: LoginUserData) => {
         message: "Invalid Email or Password",
       };
     }
+
+    await createSessionAndSetCookies(user.id);
 
     return {
       status: "SUCCESS",
