@@ -1,5 +1,4 @@
-"use client"
-
+"use client";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,29 +15,23 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { loginUserAction } from "@/features/auth/server/auth.action";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LoginUserData, loginUserSchema } from "@/features/auth/auth.schema";
 
 const LoginFrom: React.FC = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginUserSchema),
   });
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleInputChange = (name: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: LoginUserData) => {
     try {
-      const loginData = {
-        email: formData.email.toLowerCase().trim(),
-        password: formData.password,
-      };
-      const result = await loginUserAction(loginData);
+      const result = await loginUserAction(data);
       if (result.status === "SUCCESS") toast.success(result.message);
       else toast.error(result.message);
     } catch (error) {
@@ -58,7 +51,7 @@ const LoginFrom: React.FC = () => {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Email Field */}
             <div className="space-y-2">
               <Label htmlFor="email">Email Address *</Label>
@@ -67,12 +60,8 @@ const LoginFrom: React.FC = () => {
                 <Input
                   id="email"
                   type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("email", e.target.value)
-                  }
                   placeholder="Enter your email"
+                  {...register("email")}
                   required
                   className={`pl-10 `}
                 />
@@ -86,13 +75,9 @@ const LoginFrom: React.FC = () => {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="password"
-                  name="password"
                   type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("password", e.target.value)
-                  }
                   placeholder="Create a strong password"
+                  {...register("email")}
                   required
                   className={`pl-10
                 `}

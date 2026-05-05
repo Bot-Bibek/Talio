@@ -4,7 +4,12 @@ import { db } from "@/config/db";
 import { users } from "@/drizzle/schema";
 import argon2 from "argon2";
 import { eq, or } from "drizzle-orm";
-import { RegisterUserData, registerUserSchema } from "../auth.schema";
+import {
+  RegisterUserData,
+  registerUserSchema,
+  LoginUserData,
+  loginUserSchema,
+} from "../auth.schema";
 
 export const registrationAction = async (data: RegisterUserData) => {
   try {
@@ -43,14 +48,12 @@ export const registrationAction = async (data: RegisterUserData) => {
   }
 };
 
-interface LoginData {
-  email: string;
-  password: string;
-}
-
-export const loginUserAction = async (data: LoginData) => {
+export const loginUserAction = async (data: LoginUserData) => {
   try {
-    const { email, password } = data;
+    const { data: validatedData, error } = loginUserSchema.safeParse(data);
+    if (error) return { status: "ERROR", message: error.issues[0].message };
+
+    const { email, password } = validatedData;
 
     const [user] = await db.select().from(users).where(eq(users.email, email));
 
