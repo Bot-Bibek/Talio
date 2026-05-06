@@ -9,6 +9,9 @@ services:
     depends_on:
       - db
     restart: always
+    volumes:
+    - .:/app
+    - /app/node_modules
 
   db:
     image: mysql:8
