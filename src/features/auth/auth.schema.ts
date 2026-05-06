@@ -61,4 +61,4 @@ export const loginUserSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
-export type LoginUserData = z.infer<typeof loginUserScheme>;
+export type LoginUserData = z.infer<typeof loginUserSchema>;
