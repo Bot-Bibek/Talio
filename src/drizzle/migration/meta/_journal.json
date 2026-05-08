@@ -15,6 +15,13 @@
       "when": 1777397540245,
       "tag": "0001_woozy_dreaming_celestial",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1778258869517,
+      "tag": "0002_giant_veda",
+      "breakpoints": true
     }
   ]
 }
