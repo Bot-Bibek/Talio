@@ -22,6 +22,13 @@
       "when": 1778258869517,
       "tag": "0002_giant_veda",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1778342791353,
+      "tag": "0003_round_human_torch",
+      "breakpoints": true
     }
   ]
 }

@@ -14,3 +14,4 @@ export const getCurrentUser = cache(async () => {
   const user = await validateSessionAndGetUser(session)
   return user;
 })
+

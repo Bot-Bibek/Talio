@@ -1,3 +1,4 @@
+import EmployerProfileStatus from "@/components/employer/components/EmployerProfileStatus";
 import { StatsCards } from "@/components/employer/components/EmployerStats";
 import { Button } from "@/components/ui/button";
 import { logoutUserAction } from "@/features/auth/server/auth.action";
@@ -27,6 +28,8 @@ const EmployerDashboard: React.FC = async () => {
 
       {/* Stats Cards */}
       <StatsCards />
+
+      <EmployerProfileStatus />
     </div>
   );
 };
