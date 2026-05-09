@@ -1,5 +1,4 @@
 
-import EmployerSidebar from "@/components/employer/components/EmployerSidebar";
 import { getCurrentUser } from "@/features/auth/server/auth.quaries";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -14,13 +13,13 @@ export default async function DashboardLayout({
   if (!user) {
     return redirect("/login");
   }
-  // Protect employer dashboard
-  if (user.role !== "employer") {
-    return redirect("/dashboard");
+
+  // Protect applicant dashboard
+  if (user.role !== "applicant") {
+    return redirect("/employer-dashboard");
   }
   return (
     <div className="flex min-h-screen bg-background ">
-      <EmployerSidebar />
       <main className="container mx-auto mt-5 ml-70 mr-5">{children}</main>
     </div>
   );
