@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { EmployerProfileData, employerProfileSchema, organizationTypes, teamSizes } from './../../../features/employer/employer.schema';
 import { zodResolver } from "@hookform/resolvers/zod";
+import Tiptap from "@/components/TextEditor/text-editor";
 
 function EmployerSetting({initialData}:{initialData?:Partial<EmployerProfileData>}) {
   const {
@@ -139,7 +140,13 @@ function EmployerSetting({initialData}:{initialData?:Partial<EmployerProfileData
               render={({ field, fieldState }) => (
                 <div className="space-y-2">
                   <Label>Description *</Label>
-                  {/* <Tiptap content={field.value} onChange={field.onChange} /> */}
+                  <Tiptap content={field.value} onChange={field.onChange} />
+
+                  {fieldState.error && (
+                    <p className="text-sm text-destructive">
+                      {fieldState.error.message}
+                    </p>
+                  )}
                 </div>
               )}
             />
