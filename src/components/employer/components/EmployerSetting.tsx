@@ -1,11 +1,16 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import Image from "next/image";
 import { Input } from "@/components/ui/input";
-import { Briefcase, Building2, Calendar, Globe, Loader, MapPin } from "lucide-react";
+import {
+  Briefcase,
+  Building2,
+  Calendar,
+  Globe,
+  Loader,
+  MapPin,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -14,11 +19,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { EmployerProfileData, employerProfileSchema, organizationTypes, teamSizes } from './../../../features/employer/employer.schema';
+import {
+  EmployerProfileData,
+  employerProfileSchema,
+  organizationTypes,
+  teamSizes,
+} from "./../../../features/employer/employer.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Tiptap from "@/components/TextEditor/text-editor";
 
-function EmployerSetting({initialData}:{initialData?:Partial<EmployerProfileData>}) {
+import { updateEmployerProfileData } from "@/features/employer/server/employer.action";
+import { toast } from "sonner";
+
+function EmployerSetting({
+  initialData,
+}: {
+  initialData?: Partial<EmployerProfileData>;
+}) {
   const {
     register,
     handleSubmit,
@@ -35,43 +52,50 @@ function EmployerSetting({initialData}:{initialData?:Partial<EmployerProfileData
       yearOfEstablishment: initialData?.yearOfEstablishment,
       websiteUrl: initialData?.websiteUrl || "",
       location: initialData?.location || "",
-      avatarUrl: initialData?.avatarUrl || "",
-      bannerImageUrl: initialData?.bannerImageUrl || "",
     },
     resolver: zodResolver(employerProfileSchema),
   });
 
-  const handleFormSubmit = async (data: EmployerProfileData) =>{
-    console.log("Employer Form Data", data)
-  }
+  const handleFormSubmit = async (data: EmployerProfileData) => {
+    console.log("Employer Form Data", data);
+    const response = await updateEmployerProfileData(data);
+
+    if (response.status == "SUCCESS") {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
+  };
   return (
     <Card className="w-3/4 ">
       <CardContent>
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-          <div className=" grid lg:grid-cols-[1fr_4fr] gap-6">
+          {/* <div className=" grid lg:grid-cols-[1fr_4fr] gap-6">
             <Controller
               name="avatarUrl"
               control={control}
               render={({ field, fieldState }) => (
                 <div className="space-y-2">
                   <Label>Upload Logo *</Label>
-                  {/* <ImageUpload
-                    value={field.value}
+                  <Image
+                    // value={field.value}
                     onChange={field.onChange}
-                    boxText={
-                      "A photo larger than 400 pixels works best. Max photo size 5 MB."
-                    }
+                    // boxText={
+                    //   "A photo larger than 400 pixels works best. Max photo size 5 MB."
+                    // }
                     className={cn(
                       fieldState.error &&
                         "ring-1 ring-destructive/50 rounded-lg",
                       "h-64 w-64",
                     )}
-                  /> */}
-                  {/* {fieldState.error && (
+                    src={""}
+                    alt={""}
+                  />
+                  {fieldState.error && (
                     <p className="text-sm text-destructive">
                       {fieldState.error.message}
                     </p>
-                  )} */}
+                  )}
                 </div>
               )}
             />
@@ -82,22 +106,29 @@ function EmployerSetting({initialData}:{initialData?:Partial<EmployerProfileData
               render={({ field, fieldState }) => (
                 <div className="space-y-2">
                   <Label>Banner Image</Label>
-                  {/* <ImageUpload
-                    value={field.value}
+                  <Image
+                    // value={field.value}
                     onChange={field.onChange}
-                    boxText={
-                      "Banner images optimal dimension 1520×400. Supported format JPEG, PNG. Max photo size 5 MB."
-                    }
+                    // boxText={
+                    //   "Banner images optimal dimension 1520×400. Supported format JPEG, PNG. Max photo size 5 MB."
+                    // }
                     className={cn(
                       fieldState.error &&
                         "ring-1 ring-destructive/50 rounded-lg",
                       "h-64 w-full",
                     )}
-                  /> */}
+                    src={""}
+                    alt={""}
+                  />
+                  {fieldState.error && (
+                    <p className="text-sm text-destructive">
+                      {fieldState.error.message}
+                    </p>
+                  )}
                 </div>
               )}
             />
-          </div>
+          </div> */}
 
           <div className="space-y-2">
             <Label htmlFor="companyName">Company Name *</Label>
@@ -113,26 +144,6 @@ function EmployerSetting({initialData}:{initialData?:Partial<EmployerProfileData
             </div>
             {errors.name && <p className="text-sm text-destructive"></p>}
           </div>
-
-          {/* Description */}
-          {/* <div className="space-y-2">
-            <Label htmlFor="description">Company Description *</Label>
-            <div className="relative">
-              <FileText className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-              <Textarea
-                id="description"
-                placeholder="Tell us about your company, what you do, and your mission..."
-                className="pl-10 min-h-[120px] resize-none "
-                {...register("description")}
-              />
-            </div>
-            {errors.description && (
-              <p className="text-sm text-destructive">
-                {errors.description.message}
-              </p>
-            )}
-          </div> */}
-
           <div className="space-y-2">
             <Controller
               name="description"
@@ -162,17 +173,16 @@ function EmployerSetting({initialData}:{initialData?:Partial<EmployerProfileData
               <Controller
                 name="organizationType"
                 control={control}
-                render={({ field }) => (
+                render={({ field  }) => (
                   <div className="relative">
                     <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select value={field.value || " "} onValueChange={field.onChange}>
                       <SelectTrigger className="pl-10 w-full ">
                         <SelectValue placeholder="Select organization type" />
                       </SelectTrigger>
                       <SelectContent>
                         {organizationTypes.map((type) => (
                           <SelectItem key={type} value={type}>
-                            {/* {capitalizeWords(type)} */}
                             {type}
                           </SelectItem>
                         ))}
@@ -197,14 +207,13 @@ function EmployerSetting({initialData}:{initialData?:Partial<EmployerProfileData
                 render={({ field }) => (
                   <div className="relative">
                     <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select value={field.value || " "} onValueChange={field.onChange}>
                       <SelectTrigger className="pl-10 w-full ">
                         <SelectValue placeholder="Select Team Size" />
                       </SelectTrigger>
                       <SelectContent>
                         {teamSizes.map((type) => (
                           <SelectItem key={type} value={type}>
-                            {/* {capitalizeWords(type)} */}
                             {type}
                           </SelectItem>
                         ))}
@@ -232,7 +241,7 @@ function EmployerSetting({initialData}:{initialData?:Partial<EmployerProfileData
                 <Input
                   id="yearOfEstablishment"
                   type="text"
-                  placeholder="e.g., 2020"
+                  placeholder="e.g. 2020"
                   maxLength={4}
                   className="pl-10"
                   {...register("yearOfEstablishment")}
@@ -246,13 +255,12 @@ function EmployerSetting({initialData}:{initialData?:Partial<EmployerProfileData
             {/* Year of Establishment and Location - Two columns */}
             <div className="space-y-2">
               <Label htmlFor="location">Location *</Label>
-
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   id="location"
                   type="text"
-                  placeholder="e.g., Pune, Bangalore"
+                  placeholder="e.g. Gandaki, Pokhara"
                   className="pl-10"
                   {...register("location")}
                 />
@@ -294,3 +302,4 @@ function EmployerSetting({initialData}:{initialData?:Partial<EmployerProfileData
 }
 
 export default EmployerSetting;
+
