@@ -31,11 +31,11 @@ import Tiptap from "@/components/TextEditor/text-editor";
 import { updateEmployerProfileData } from "@/features/employer/server/employer.action";
 import { toast } from "sonner";
 
-function EmployerSetting({
-  initialData,
-}: {
+interface Props {
   initialData?: Partial<EmployerProfileData>;
-}) {
+}
+
+function EmployerSetting({ initialData }: Props) {
   const {
     register,
     handleSubmit,
@@ -43,7 +43,7 @@ function EmployerSetting({
     setValue,
     watch, //Give me the current value of this field in the form state, and re-render this component when it changes.
     formState: { errors, isDirty, isSubmitting },
-  } = useForm({
+  } = useForm<EmployerProfileData>({
     defaultValues: {
       name: initialData?.name || "",
       description: initialData?.description || "",
@@ -142,7 +142,9 @@ function EmployerSetting({
                 {...register("name")}
               />
             </div>
-            {errors.name && <p className="text-sm text-destructive"></p>}
+            {errors.name && (
+              <p className="text-sm text-destructive">{errors.name.message}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Controller
@@ -152,7 +154,6 @@ function EmployerSetting({
                 <div className="space-y-2">
                   <Label>Description *</Label>
                   <Tiptap content={field.value} onChange={field.onChange} />
-
                   {fieldState.error && (
                     <p className="text-sm text-destructive">
                       {fieldState.error.message}
@@ -173,10 +174,13 @@ function EmployerSetting({
               <Controller
                 name="organizationType"
                 control={control}
-                render={({ field  }) => (
+                render={({ field }) => (
                   <div className="relative">
                     <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
-                    <Select value={field.value || " "} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value || " "}
+                      onValueChange={field.onChange}
+                    >
                       <SelectTrigger className="pl-10 w-full ">
                         <SelectValue placeholder="Select organization type" />
                       </SelectTrigger>
@@ -207,7 +211,10 @@ function EmployerSetting({
                 render={({ field }) => (
                   <div className="relative">
                     <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
-                    <Select value={field.value || " "} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value || " "}
+                      onValueChange={field.onChange}
+                    >
                       <SelectTrigger className="pl-10 w-full ">
                         <SelectValue placeholder="Select Team Size" />
                       </SelectTrigger>

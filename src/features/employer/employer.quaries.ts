@@ -1,4 +1,3 @@
-
 import { getCurrentUser } from "../auth/server/auth.quaries"
 import { db } from "@/config/db"
 import { employers } from "@/drizzle/schema"
