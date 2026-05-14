@@ -10,6 +10,7 @@ import {
   Globe,
   Loader,
   MapPin,
+  X,
 } from "lucide-react";
 import {
   Select,
@@ -27,9 +28,11 @@ import {
 } from "./../../../features/employer/employer.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Tiptap from "@/components/TextEditor/text-editor";
-
+import { ComponentProps, useState } from "react";
 import { updateEmployerProfileData } from "@/features/employer/server/employer.action";
 import { toast } from "sonner";
+import { UploadButton, useUploadThing } from "@/lib/uploadthing";
+import Image from "next/image";
 
 interface Props {
   initialData?: Partial<EmployerProfileData>;
@@ -45,6 +48,7 @@ function EmployerSetting({ initialData }: Props) {
     formState: { errors, isDirty, isSubmitting },
   } = useForm<EmployerProfileData>({
     defaultValues: {
+      avatarUrl: initialData?.avatarUrl || "",
       name: initialData?.name || "",
       description: initialData?.description || "",
       organizationType: initialData?.organizationType || undefined,
@@ -55,6 +59,12 @@ function EmployerSetting({ initialData }: Props) {
     },
     resolver: zodResolver(employerProfileSchema),
   });
+
+  const avatarUrl = watch("avatarUrl");
+
+  const handleRemoveAvatar = () => {
+    setValue("avatarUrl", "");
+  };
 
   const handleFormSubmit = async (data: EmployerProfileData) => {
     console.log("Employer Form Data", data);
@@ -70,65 +80,47 @@ function EmployerSetting({ initialData }: Props) {
     <Card className="w-3/4 ">
       <CardContent>
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-          {/* <div className=" grid lg:grid-cols-[1fr_4fr] gap-6">
-            <Controller
-              name="avatarUrl"
-              control={control}
-              render={({ field, fieldState }) => (
-                <div className="space-y-2">
-                  <Label>Upload Logo *</Label>
-                  <Image
-                    // value={field.value}
-                    onChange={field.onChange}
-                    // boxText={
-                    //   "A photo larger than 400 pixels works best. Max photo size 5 MB."
-                    // }
-                    className={cn(
-                      fieldState.error &&
-                        "ring-1 ring-destructive/50 rounded-lg",
-                      "h-64 w-64",
-                    )}
-                    src={""}
-                    alt={""}
-                  />
-                  {fieldState.error && (
-                    <p className="text-sm text-destructive">
-                      {fieldState.error.message}
-                    </p>
-                  )}
-                </div>
-              )}
-            />
-
-            <Controller
-              name="bannerImageUrl"
-              control={control}
-              render={({ field, fieldState }) => (
-                <div className="space-y-2">
-                  <Label>Banner Image</Label>
-                  <Image
-                    // value={field.value}
-                    onChange={field.onChange}
-                    // boxText={
-                    //   "Banner images optimal dimension 1520×400. Supported format JPEG, PNG. Max photo size 5 MB."
-                    // }
-                    className={cn(
-                      fieldState.error &&
-                        "ring-1 ring-destructive/50 rounded-lg",
-                      "h-64 w-full",
-                    )}
-                    src={""}
-                    alt={""}
-                  />
-                  {fieldState.error && (
-                    <p className="text-sm text-destructive">
-                      {fieldState.error.message}
-                    </p>
-                  )}
-                </div>
-              )}
-            />
-          </div> */}
+          <Label>Company Logo</Label>
+          {avatarUrl ? (
+            <div className="flex items-center gap-4">
+              <div className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-border">
+                <Image
+                  src={avatarUrl}
+                  alt="Company logo"
+                  className="w-full h-full object-cover"
+                  width={100}
+                  height={100}
+                />
+              </div>
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={handleRemoveAvatar}
+              >
+                <X className="w-4 h-4 mr-2" />
+                Remove Logo
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <UploadButton
+                endpoint="imageUploader"
+                onClientUploadComplete={(res) => {
+                  const logoPic = res[0];
+                  setValue("avatarUrl", logoPic.ufsUrl, {
+                    shouldDirty: true,
+                  });
+                  console.log("Files: ", res);
+                  alert("Upload Completed");
+                }}
+                onUploadError={(error: Error) => {
+                  // Do something with the error.
+                  alert(`ERROR! ${error.message}`);
+                }}
+              />
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="companyName">Company Name *</Label>
@@ -310,3 +302,35 @@ function EmployerSetting({ initialData }: Props) {
 
 export default EmployerSetting;
 
+type ImageUploadProps = Omit<ComponentProps<"div">, "onChange"> & {
+  value?: string;
+  boxText?: string;
+  onChange: (url: string) => void;
+};
+
+export const ImageUpload = ({
+  value,
+  onChange,
+  className,
+  boxText,
+  ...props
+}: ImageUploadProps) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const { startUpload } = useUploadThing("imageUploader", {
+    onClientUploadComplete: (res) => {
+      if (res && res[0]) {
+        onChange(res[0].ufsUrl);
+        toast.success("Image uploaded successfully!");
+      }
+      setIsUploading(false);
+      setPreviewUrl(null);
+    },
+    onUploadError: (error: Error) => {
+      toast.error(`Upload failed: ${error.message}`);
+      setIsUploading(false);
+      setPreviewUrl(null);
+    },
+  });
+};

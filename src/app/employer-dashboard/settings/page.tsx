@@ -15,6 +15,7 @@ async function page() {
     <div>
       <EmployerSetting
         initialData={{
+          avatarUrl: currentEmployerData.avatarUrl,
           name: currentEmployerData.employerDetails.name,
           description: currentEmployerData.employerDetails.description,
           organizationType:
