@@ -18,3 +18,19 @@ export const { useUploadThing, uploadFiles } =
 // Connects to the avatarImage upload endpoint
 // Gives you startUpload(files) to trigger uploads manually
 // Gives upload state (isUploading) for UI control
+
+export const deleteImage = async (fileKey: string) => {
+  const response = await fetch("/api/uploadthing/deleteImage", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ fileKey }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete image");
+  }
+
+  return response.json();
+};
