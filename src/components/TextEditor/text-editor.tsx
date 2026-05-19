@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Popover, PopoverContent } from "../ui/popover";
 import { ReactNode, useState } from "react";
 import {
   Select,
@@ -73,7 +73,7 @@ const Tiptap = ({
           <FloatingMenu editor={editor} />
         </>
       )}
-      <EditorContent editor={editor} className="min-h-[300px] px-4 py-3" />
+      <EditorContent editor={editor} className="min-h-75 px-4 py-3" />
     </div>
   );
 };
@@ -107,9 +107,13 @@ function LinkComponent({
 
   return (
     <Popover open={isLinkPopoverOpen} onOpenChange={setIsLinkPopoverOpen}>
-      <PopoverTrigger>{children}</PopoverTrigger>
-      {/* // this is the main */}
-      {/* trigger point */}
+      <Toggle
+        size="sm"
+        aria-label="Toggle link"
+        onPressedChange={() => setIsLinkPopoverOpen((prev) => !prev)}
+      >
+        {children}
+      </Toggle>
       <PopoverContent className="w-80 p-4">
         <div className="flex flex-col gap-4">
           <h3 className="font-medium">Insert Link</h3>
@@ -203,7 +207,7 @@ const ToolBar = ({ editor }: { editor: Editor }) => {
                     : "paragraph"
         }
       >
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-45">
           <SelectValue placeholder="Paragraph" />
         </SelectTrigger>
         <SelectContent>
@@ -312,9 +316,7 @@ const ToolBar = ({ editor }: { editor: Editor }) => {
         </Toggle>
       ) : (
         <LinkComponent editor={editor}>
-          <Toggle size="sm" aria-label="Toggle link">
-            <LinkIcon className="h-4 w-4" />
-          </Toggle>
+          <LinkIcon className="h-4 w-4" />
         </LinkComponent>
       )}
 
@@ -468,9 +470,7 @@ export function BubbleMenu({ editor }: { editor: Editor }) {
         </Toggle>
       ) : (
         <LinkComponent editor={editor}>
-          <Toggle size="sm" aria-label="Toggle link">
-            <LinkIcon className="h-4 w-4" />
-          </Toggle>
+          <LinkIcon className="h-4 w-4" />
         </LinkComponent>
       )}
     </TiptapBubbleMenu>
@@ -598,9 +598,7 @@ export function FloatingMenu({ editor }: { editor: Editor }) {
         </Toggle>
       ) : (
         <LinkComponent editor={editor}>
-          <Toggle size="sm" aria-label="Toggle link">
-            <LinkIcon className="h-4 w-4" />
-          </Toggle>
+          <LinkIcon className="h-4 w-4" />
         </LinkComponent>
       )}
     </TiptapFloatingMenu>

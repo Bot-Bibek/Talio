@@ -33,7 +33,7 @@ import Tiptap from "@/components/TextEditor/text-editor";
 import { ComponentProps, useState } from "react";
 import { updateEmployerProfileData } from "@/features/employer/server/employer.action";
 import { toast } from "sonner";
-import { deleteImage, UploadButton, useUploadThing } from "@/lib/uploadthing";
+import { deleteImage,useUploadThing } from "@/lib/uploadthing";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useDropzone } from "@uploadthing/react";
@@ -60,7 +60,7 @@ function EmployerSetting({ initialData }: Props) {
       yearOfEstablishment: initialData?.yearOfEstablishment,
       websiteUrl: initialData?.websiteUrl || "",
       location: initialData?.location || "",
-      // bannerImageUrl: initialData?.bannerImageUrl || "",
+      bannerImageUrl: initialData?.bannerImageUrl || "",
     },
     resolver: zodResolver(employerProfileSchema),
   });

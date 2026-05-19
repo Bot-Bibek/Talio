@@ -23,6 +23,7 @@ export const updateEmployerProfileData = async (data: EmployerProfileData) => {
       websiteUrl,
       location,
       avatarUrl,
+      bannerImageUrl,
     } = data;
 
     const updatedEmployer = await db
@@ -32,6 +33,7 @@ export const updateEmployerProfileData = async (data: EmployerProfileData) => {
         description,
         organizationType,
         teamSize,
+        bannerImageUrl,
         yearOfEstablishment: yearOfEstablishment
           ? parseInt(yearOfEstablishment)
           : null,

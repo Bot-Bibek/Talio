@@ -25,8 +25,7 @@ async function page() {
           yearOfEstablishment:
             currentEmployerData.employerDetails.yearOfEstablishment?.toString(),
           websiteUrl: currentEmployerData.employerDetails.websiteUrl,
-          // bannerImageUrl: currentEmployerData.employerDetails.bannerImageUrl
-          
+          bannerImageUrl: currentEmployerData.employerDetails.bannerImageUrl,
         }}
       />
     </div>
