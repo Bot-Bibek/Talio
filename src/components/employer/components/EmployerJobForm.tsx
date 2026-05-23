@@ -20,6 +20,7 @@ import {
   WORK_TYPE,
 } from "@/config/constant";
 import { JobPostData, jobPostSchema } from "@/features/jobs/jobs.schema";
+import { createJobPost } from "@/features/jobs/server/jobs.action";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Award,
@@ -32,22 +33,55 @@ import {
   Currency,
   CalendarRange,
   GraduationCap,
+  Loader,
 } from "lucide-react";
 import React from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function EmployerJobForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<JobPostData>({
+    control,
+    formState: { errors, isDirty, isSubmitting },
+  } = useForm({
     resolver: zodResolver(jobPostSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+
+      jobType: undefined,
+      workType: undefined,
+      jobLevel: undefined,
+
+      location: "",
+      tags: "",
+
+      minSalary: "",
+      maxSalary: "",
+      salaryCurrency: undefined,
+      salaryPeriod: undefined,
+
+      minEducation: undefined,
+      experience: "",
+      expiresAt: "",
+    },
   });
+
+  const handleFormSubmit = async (data: JobPostData) => {
+    console.log("Jobs Data: ", data);
+    const response = await createJobPost(data);
+    if (response.status == "SUCCESS") {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
+  };
   return (
     <Card className="w-3/4">
       <CardContent>
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
           {/* Job Title */}
           <div className="space-y-2">
             <Label htmlFor="title">Job Title *</Label>
@@ -57,9 +91,13 @@ export default function EmployerJobForm() {
                 id="title"
                 type="text"
                 placeholder="e.g., Senior Frontend Developer"
-                className="pl-10"
+                className={`pl-10 ${errors.title ? "border-destructive" : ""}`}
+                {...register("title")}
               />
             </div>
+            {errors.title && (
+              <p className="text-sm text-destructive">{errors.title.message}</p>
+            )}
           </div>
 
           {/* Job Type, Work Type, Job Level */}
@@ -85,40 +123,68 @@ export default function EmployerJobForm() {
 
             <div className="space-y-2">
               <Label htmlFor="workType">Work Type *</Label>
-              <div className="relative">
-                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
-                <Select>
-                  <SelectTrigger id="workType" className="pl-10 w-full">
-                    <SelectValue placeholder="Select work type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {WORK_TYPE.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Controller
+                name="workType"
+                control={control}
+                render={({ field }) => (
+                  <div className="relative">
+                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
+                    <Select
+                      value={field.value || ""}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger id="workType" className="pl-10 w-full">
+                        <SelectValue placeholder="Select work type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {WORK_TYPE.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              />
+              {errors.workType && (
+                <p className="text-sm text-destructive">
+                  {errors.workType.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="jobLevel">Job Level *</Label>
-              <div className="relative">
-                <Award className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
-                <Select>
-                  <SelectTrigger id="jobLevel" className="pl-10 w-full">
-                    <SelectValue placeholder="Select job level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {JOB_LEVEL.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Controller
+                name="jobLevel"
+                control={control}
+                render={({ field }) => (
+                  <div className="relative">
+                    <Award className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
+                    <Select
+                      value={field.value || ""}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger id="jobLevel" className="pl-10 w-full">
+                        <SelectValue placeholder="Select job level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {JOB_LEVEL.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              />
+              {errors.jobLevel && (
+                <p className="text-sm text-destructive">
+                  {errors.jobLevel.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -258,9 +324,15 @@ export default function EmployerJobForm() {
 
           {/* Submit */}
           <div className="flex items-center gap-4 pt-4 flex-wrap">
-            <Button type="submit" className="w-full md:w-auto">
-              Post Job
+            <Button type="submit">
+              {isSubmitting && <Loader className="w-4 h-4 animate-spin" />}
+              {isSubmitting ? "Job Posting..." : "Post Job"}
             </Button>
+            {!isDirty && (
+              <p className="text-sm text-muted-foreground">
+                No changes to save
+              </p>
+            )}
           </div>
         </form>
       </CardContent>
