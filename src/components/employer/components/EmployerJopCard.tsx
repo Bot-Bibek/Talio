@@ -1,13 +1,25 @@
-"use Client"
+"use Client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { JobCardProps } from "@/features/jobs/types/jobs.types";
+import { Badge, MapPin, Pencil, Trash2 } from "lucide-react";
 
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { JobCardProps } from '@/features/jobs/types/jobs.types';
-import { Badge, MapPin, Pencil, Trash2 } from 'lucide-react';
-import React from 'react'
-
-export default function EmployerJopCard({job, onDelete, onEdit}: JobCardProps) {
+export default function EmployerJopCard({
+  job,
+  onDelete,
+  onEdit,
+}: JobCardProps) {
   return (
     <Card className="hover:shadow-md transition cursor-pointer">
       <CardContent className="space-y-3 p-4">
@@ -44,7 +56,8 @@ export default function EmployerJopCard({job, onDelete, onEdit}: JobCardProps) {
                     This action cannot be undone. This will permanently delete
                     the job listing for
                     <span className="font-semibold text-foreground">
-                      "{job.title}"
+                      {" "}
+                      {job.title}
                     </span>
                     .
                   </AlertDialogDescription>

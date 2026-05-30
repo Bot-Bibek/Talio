@@ -93,7 +93,7 @@ export const EmployerJobForm = ({
       const response = await createJobPost(data);
       if (response.status === "SUCCESS") {
         toast.success(response.message);
-        router.push("/employer-dashboard/jobs");
+        // router.push("/employer-dashboard/jobs");
         // router.refresh(); // Ensure the list page shows new data
       } else toast.error(response.message);
     } catch (error) {
